@@ -42,7 +42,7 @@ def upload_prices():
     with Session(engine) as session:
         for price in prices_data:
             entry = HistModel(date=price['Date'], close=price['Close'], ticker=ticker.upper())
-            existing_entry = session.query(HistModel).filter_by(date=price['Date'], ticker = ticker.upper()).first()
+            existing_entry = session.query(HistModel).filter_by(date=price['Date'], ticker=ticker.upper()).first()
             if existing_entry:
                 existing_entry.close = price['Close']
             else:
@@ -51,8 +51,7 @@ def upload_prices():
 
     # upload_via_pandas(ticker, engine)
 
-
-    return {"status":"OK"}, 200
+    return {"status": "OK"}, 200
 
 
 if __name__ == "__main__":
