@@ -49,17 +49,21 @@ def token_required(f):
 
     return decorated
 
+
 @login_manager.user_loader
 def load_user(user_id, session: Session):
     return session.get(User, user_id)
 
+
 login_manager.init_app(app)
+
 
 @app.route("/")
 def home():
     return "<p>Hello, World!</p>"
 
-@app.route("/register", methods= ["POST"])
+
+@app.route("/register", methods=["POST"])
 def register():
     req = request.json
     username = req['username']
@@ -95,10 +99,10 @@ def login():
             return jsonify({"message": "Invalid username or password"}), 401
 
 
-@app.route("/protected")
+@app.route("/get_user_info", methods=['POST'])
 @token_required
-def protected_page(user):
-    return f"Logged in! {user.username}", 200
+def user_info(user):
+    return {"username": user.username}
 
 
 @app.route("/sum", methods=["GET", "POST"])
@@ -140,6 +144,7 @@ def upload_prices():
     # upload_via_pandas(ticker, engine)
 
     return {"status": "OK"}, 200
+
 
 @app.route("/ask_llm", methods=["GET", "POST"])
 def ask_llm():
