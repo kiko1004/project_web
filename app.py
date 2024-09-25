@@ -71,9 +71,18 @@ def register():
     user = User(username=username)
     user.set_password(password)
     with Session(engine) as session:
+        user_check = session.query(User).filter_by(username=user.username).first()
+        if user_check:
+            return jsonify({"message": "User already exists!"}), 401
         session.add(user)
         session.commit()
-    return "Success", 201
+
+        token = jwt.encode({
+            'user_id': user.id,
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)  # Token expiration time
+        }, SECRET_KEY, algorithm="HS256")
+
+    return jsonify({"token": token}), 200
 
 
 @app.route("/login", methods=["POST"])
@@ -95,8 +104,7 @@ def login():
             }, SECRET_KEY, algorithm="HS256")
 
             return jsonify({"token": token}), 200
-        else:
-            return jsonify({"message": "Invalid username or password"}), 401
+        return jsonify({"message": "Invalid username or password"}), 401
 
 
 @app.route("/get_user_info", methods=['POST'])
